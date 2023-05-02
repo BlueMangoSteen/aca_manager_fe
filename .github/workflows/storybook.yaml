@@ -1,0 +1,33 @@
+name: Vercel Storybook Deployment
+
+on:
+  pull_request:
+    branches: main
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: create vercel.json
+        run: |
+          touch vercel.json
+          echo '
+          {
+            "$schema": "https://openapi.vercel.sh/vercel.json",
+            "buildCommand": "yarn build-storybook",
+            "devCommand": "yarn storybook",
+            "installCommand": "yarn install",
+            "framework": null,
+            "outputDirectory": "./storybook-static"
+          }
+          ' >> vercel.json
+      - uses: amondnet/vercel-action@v20
+        with:
+          vercel-token: ${{ secrets.VERCEL_STORYBOOK_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_STORYBOOK_ORG_ID}}
+          vercel-project-id: ${{ secrets.VERCEL_STORYBOOK_PROJECT_ID}}
